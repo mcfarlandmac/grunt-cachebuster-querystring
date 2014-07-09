@@ -12,46 +12,46 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    jshint: {
-      all: [
-        'Gruntfile.js',
-        'tasks/*.js',
-        '<%= nodeunit.tests %>'
-      ],
-      options: {
-        jshintrc: '.jshintrc'
-      }
+	clean: {
+        tmp: 'tmp'
     },
 
-    // Before generating any new files, remove any previously-created files.
-    clean: {
-      tests: ['tmp']
-    },
+	jshint: {
+		all: [
+			'Gruntfile.js',
+			'tasks/*.js',
+			'<%= nodeunit.tests %>'
+		],
+		options: {
+			jshintrc: '.jshintrc'
+		}
+	},
+	
+	copy: {
+		main: {
+			files: [{
+				expand: true,
+				cwd: 'test/fixtures',
+				src: ['**'],
+				dest: 'tmp/'
+			}]
+		}
+	},
 
     // Configuration to be run (and then tested).
     cachebuster_querystring: {
-      default_options: {
+      default: {
         options: {
         },
-        files: {
-          'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
-        }
-      },
-      custom_options: {
-        options: {
-          separator: ': ',
-          punctuation: ' !!!'
-        },
-        files: {
-          'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
-        }
+        files: [{
+			src: 'tmp/*.html'
+		}]
       }
     },
 
-    // Unit tests.
     nodeunit: {
-      tests: ['test/*_test.js']
-    }
+		tests: ['test/*_test.js']
+	},
 
   });
 
@@ -60,14 +60,10 @@ module.exports = function(grunt) {
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
-  // Whenever the "test" task is run, first clean the "tmp" dir, then run this
-  // plugin's task(s), then test the result.
-  grunt.registerTask('test', ['clean', 'cachebuster_querystring', 'nodeunit']);
-
-  // By default, lint and run all tests.
-  grunt.registerTask('default', ['jshint', 'test']);
-
+  grunt.registerTask('test', ['clean', 'copy', 'cachebuster_querystring', 'nodeunit']);
 };
